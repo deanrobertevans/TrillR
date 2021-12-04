@@ -21,7 +21,6 @@ get.wavs <- function(directory=getwd(),start.date=NULL,end.date=NULL,timezone="A
   }
   file.path <- list.files(directory,pattern = "\\.wav$",recursive = T, full.names=T)
   basename <-  gsub(pattern=".wav","",basename(file.path))
-  file.name <- gsub(pattern=".wav","",file.name)
   location <- sub("\\_.*", "", basename)
   date.time <- paste0(as.character(stringr::str_extract(basename,"(?<=_)\\d{8}(?=_)")), " ", as.character(sub(".*(\\d+{6}).*$","\\1", basename)))
     date.time <- lubridate::ymd_hms(date.time,tz=timezone)
