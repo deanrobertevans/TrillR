@@ -16,17 +16,15 @@
 #' @examples
 #' data <- get.wavs(start.date = "2017-06-01", end.date = "2017-06-30", getDuration=T, minduration=180) #gets recordings of at least 3 min long for the month of June 2o17.
 get.wavs <- function(directory=getwd(),start.date=NULL,end.date=NULL,timezone="America/Denver",getDuration=TRUE, minduration = 0 ){
-  if (!exists("SoXexe", envir = .TrillRenv)) stop("You are getting ahead of yourself! You need to specify the location of Sox.exe first")
+  if(getDuration){
+    if (!exists("SoXexe", envir = .TrillRenv)) stop("You are getting ahead of yourself! You need to specify the location of Sox.exe first")
+  }
   file.path <- list.files(directory,pattern = "\\.wav$",recursive = T, full.names=T)
-  file.name <- list.files(directory,pattern = "\\.wav$",recursive = T, full.names=F)
   basename <-  gsub(pattern=".wav","",basename(file.path))
   file.name <- gsub(pattern=".wav","",file.name)
-  loc.data <- regmatches(file.name, regexec('/(.*?)\\_', file.name))
-  location <-NULL
-  for (i in 1:length(file.name)) {
-    location[i] <- loc.data[[i]][2]}
-  date.time <- paste0(as.character(stringr::str_extract(file.name,"(?<=_)\\d{8}(?=_)"))," ",as.character(sub(".*(\\d+{6}).*$", "\\1", file.name)))
-  date.time <- lubridate::ymd_hms(date.time,tz=timezone)
+  location <- sub("\\_.*", "", basename)
+  date.time <- paste0(as.character(stringr::str_extract(basename,"(?<=_)\\d{8}(?=_)")), " ", as.character(sub(".*(\\d+{6}).*$","\\1", basename)))
+    date.time <- lubridate::ymd_hms(date.time,tz=timezone)
   JDay <- lubridate::yday(date.time)
   data <- data.frame(file.path=file.path,basename=basename,location=location,datetime=date.time,JDay=JDay,stringsAsFactors = F)
   data <- subset(data,grepl(pattern = "Listening_Selection",data$file.path)==FALSE)
